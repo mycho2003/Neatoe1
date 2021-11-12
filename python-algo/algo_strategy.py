@@ -124,6 +124,10 @@ class AlgoStrategy(gamelib.AlgoCore):
             if game_state.get_resource(SP) <= 12:
                 break
             game_state.attempt_upgrade(wall)
+        for wall in bottom_walls:
+            if game_state.get_resource(SP) <= 12:
+                break
+            game_state.attempt_upgrade(wall)
 
     def attackWithScouts(self, game_state):
         friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
