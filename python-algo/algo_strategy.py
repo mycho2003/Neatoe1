@@ -152,8 +152,6 @@ class AlgoStrategy(gamelib.AlgoCore):
         interceptor_points = [[3, 10], [24, 10]]
 
         if game_state.get_resource(MP, 1) >= 5:
-            game_state.attempt_spawn(INTERCEPTOR, interceptor_points[random.randint(0, 1)])
-        elif game_state.get_resource(MP, 1) >= 10:
             game_state.attempt_spawn(INTERCEPTOR, interceptor_points)
 
     
