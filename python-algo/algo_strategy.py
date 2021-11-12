@@ -91,16 +91,41 @@ class AlgoStrategy(gamelib.AlgoCore):
         # Useful tool for setting up your base locations: https://www.kevinbai.design/terminal-map-maker
         # More community tools available at: https://terminal.c1games.com/rules#Download
 
+        funnel_two = [[16, 9], [17, 10], [18, 11], [19, 12], [20, 13]]
+        extra_turrets = [[3, 12], [24, 12]]
         # Place turrets that attack enemy units
-        turret_locations = [[0, 13], [27, 13], [8, 11], [19, 11], [13, 11], [14, 11]]
+        turret_locations = [[22, 10], [5, 10], [14, 9]]
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
         game_state.attempt_spawn(TURRET, turret_locations)
-        
+
         # Place walls in front of turrets to soak up damage for them
-        wall_locations = [[8, 12], [19, 12]]
+        wall_locations = [[0, 13], [1, 13], [2, 13], [3, 13], [4, 12], [5, 11], [6, 10], [7, 9], [14, 10], [21, 10], [22, 11], [23, 12], [24, 13], [25, 13], [26, 13], [27, 13]]
+        bottom_walls = []
+        for a in range(8, 20):
+            bottom_walls.append([a, 8])
         game_state.attempt_spawn(WALL, wall_locations)
+        game_state.attempt_spawn(WALL, bottom_walls)
         # upgrade walls so they soak more damage
-        game_state.attempt_upgrade(wall_locations)
+        upgrade_wall_locations = [[22, 11], [5, 11], [14, 10], [0, 13], [27, 13]]
+        game_state.attempt_upgrade(upgrade_wall_locations)
+        # if bottom walls are low, then reinforce them
+        for wall in bottom_walls:
+            wall = game_state.contains_stationary_unit(wall)
+            if wall and wall.health/wall.max_health < 0.5:
+                game_state.attempt_spawn(WALL, [wall[0], wall[1]-1])
+
+        if game_state.get_resource(SP) > 6:
+            game_state.attempt_spawn(WALL, funnel_two)
+
+        if game_state.get_resource(SP) >= 20:
+            game_state.attempt_spawn(TURRET, extra_turrets)
+            for turret in extra_turrets:
+                game_state.attempt_upgrade([turret[0], turret[1]+1])
+
+        for wall in wall_locations:
+            if game_state.get_resource(SP) <= 12:
+                break
+            game_state.attempt_upgrade(wall)
 
     def build_reactive_defense(self, game_state):
         """
