@@ -151,9 +151,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         # friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         interceptor_points = [[3, 10], [24, 10]]
 
-        if game_state.get_resources(MP, 1) >= 5:
+        if game_state.get_resource(MP, 1) >= 5:
             game_state.attempt_spawn(INTERCEPTOR, interceptor_points[random.randint(0, 1)])
-        elif game_state.get_resources(MP, 1) >= 10:
+        elif game_state.get_resource(MP, 1) >= 10:
             game_state.attempt_spawn(INTERCEPTOR, interceptor_points)
 
     
