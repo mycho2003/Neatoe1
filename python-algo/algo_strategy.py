@@ -92,15 +92,29 @@ class AlgoStrategy(gamelib.AlgoCore):
         # More community tools available at: https://terminal.c1games.com/rules#Download
 
         # Place turrets that attack enemy units
-        turret_locations = [[0, 13], [27, 13], [8, 11], [19, 11], [13, 11], [14, 11]]
+        turret_locations = [[22, 10], [5, 10], [14, 9]]
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
         game_state.attempt_spawn(TURRET, turret_locations)
-        
+
         # Place walls in front of turrets to soak up damage for them
-        wall_locations = [[8, 12], [19, 12]]
+        wall_locations = [[0, 13], [1, 13], [2, 13], [3, 13], [4, 12], [5, 11], [6, 10], [7, 9], [20, 9], [21, 10], [22, 11], [23, 12], [24, 13], [25, 13], [26, 13], [27, 13]]
+        bottom_walls = []
+        for a in range(8, 20):
+            bottom_walls.append([a, 8])
         game_state.attempt_spawn(WALL, wall_locations)
+        game_state.attempt_spawn(WALL, bottom_walls)
         # upgrade walls so they soak more damage
-        game_state.attempt_upgrade(wall_locations)
+        upgrade_wall_locations = [[22, 11], [5, 11], [14, 10], [0, 13], [27, 13]]
+        game_state.attempt_upgrade(upgrade_wall_locations)
+        # if bottom walls are low, then reinforce them
+        for wall in bottom_walls:
+            wall = game_state.contains_stationary_unit(wall)
+            if wall and wall.health/wall.max_health < 0.5:
+                game_state.attempt_spawn(WALL, wall - [0, 1])
+
+        if game_state.get_resource(SP) > 6:
+            funnel_two = [[17, 10], [18, 11], [19, 12], [20, 13]]
+            game_state.attempt_spawn(WALL, funnel_two)
 
     def build_reactive_defense(self, game_state):
         """
@@ -118,11 +132,13 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         deploy_locations = self.filter_blocked_locations(friendly_edges, game_state)
 
-        send_location = self.least_damage_spawn_location(self, game_state, deploy_locations)
+        send_location = self.least_damage_spawn_location(game_state, deploy_locations)
 
-        game_state.attempt_spawn(INTERCEPTOR, send_location) # Sends one intercepter to prevent massive rushes
+        # Sends one intercepter to prevent massive rushes
+        game_state.attempt_spawn(INTERCEPTOR, send_location)
 
-        while game_state.get_resource(MP) >= game_state.type_cost(SCOUT)[MP]: # Uses all available MP to attack
+        # Uses all available MP to attack
+        while game_state.get_resource(MP) >= game_state.type_cost(SCOUT)[MP]:
             game_state.attempt_spawn(SCOUT, send_location)
 
     def stall_with_interceptors(self, game_state):
@@ -134,23 +150,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         interceptor_points = [[3, 10], [24, 10]]
 
         for point in interceptor_points:
-            game_state.attempt_spawn(INTERCEPTOR, point);
-
-        # Remove locations that are blocked by our own structures
-        # since we can't deploy units there.
-        deploy_locations = self.filter_blocked_locations(interceptor_points, game_state)
-
-        # While we have remaining MP to spend lets send out interceptors randomly.
-        while game_state.get_resource(MP) >= game_state.type_cost(INTERCEPTOR)[MP] and len(deploy_locations) > 0:
-            # Choose a random deploy location.
-            deploy_index = random.randint(0, len(deploy_locations) - 1)
-            deploy_location = deploy_locations[deploy_index]
-
-            game_state.attempt_spawn(INTERCEPTOR, deploy_location)
-            """
-            We don't have to remove the location since multiple mobile 
-            units can occupy the same space.
-            """
+            game_state.attempt_spawn(INTERCEPTOR, point)
 
     def demolisher_line_strategy(self, game_state):
         """
