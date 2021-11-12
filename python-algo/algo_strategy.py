@@ -91,7 +91,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         # Useful tool for setting up your base locations: https://www.kevinbai.design/terminal-map-maker
         # More community tools available at: https://terminal.c1games.com/rules#Download
 
-        funnel_two = [[16, 9], [17, 10], [18, 11], [19, 12], [20, 13]]
+        funnel_two = [[16, 9], [17, 10], [18, 11], [19, 12]]
         extra_turrets = [[3, 12], [24, 12]]
         # Place turrets that attack enemy units
         turret_locations = [[22, 10], [5, 10], [14, 9]]
