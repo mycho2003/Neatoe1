@@ -75,8 +75,6 @@ class AlgoStrategy(gamelib.AlgoCore):
         """
         # First, place basic defenses
         self.build_defences(game_state)
-        # Now build reactive defenses based on where the enemy scored
-        self.build_reactive_defense(game_state)
 
         if game_state.get_resource(MP) > 10:
             self.attackWithScouts(game_state)
@@ -126,17 +124,6 @@ class AlgoStrategy(gamelib.AlgoCore):
             if game_state.get_resource(SP) <= 12:
                 break
             game_state.attempt_upgrade(wall)
-
-    def build_reactive_defense(self, game_state):
-        """
-        This function builds reactive defenses based on where the enemy scored on us from.
-        We can track where the opponent scored by looking at events in action frames 
-        as shown in the on_action_frame function
-        """
-        for location in self.scored_on_locations:
-            # Build turret one space above so that it doesn't block our own edge spawn locations
-            build_location = [location[0], location[1]+1]
-            game_state.attempt_spawn(TURRET, build_location)
 
     def attackWithScouts(self, game_state):
         friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
