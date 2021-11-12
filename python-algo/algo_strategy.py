@@ -115,7 +115,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         if game_state.get_resource(SP) > 6:
             game_state.attempt_spawn(WALL, funnel_two)
 
-        if game_state.get_resource(SP) >= 20:
+        if game_state.get_resource(SP) > 12:
             game_state.attempt_spawn(TURRET, extra_turrets)
             for turret in extra_turrets:
                 game_state.attempt_upgrade([turret[0], turret[1]+1])
