@@ -110,8 +110,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         game_state.attempt_upgrade(upgrade_wall_locations)
         # if bottom walls are low, then reinforce them
         for wall in bottom_walls:
-            wall = game_state.contains_stationary_unit(wall)
-            if wall and wall.health/wall.max_health < 0.5:
+            wall_unit = game_state.contains_stationary_unit(wall)
+            if wall_unit and wall_unit.health/wall_unit.max_health < 0.5:
                 game_state.attempt_spawn(WALL, [wall[0], wall[1]-1])
 
         if game_state.get_resource(SP) > 6:
