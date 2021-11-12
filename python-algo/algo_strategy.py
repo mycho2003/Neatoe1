@@ -143,11 +143,13 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         deploy_locations = self.filter_blocked_locations(friendly_edges, game_state)
 
-        send_location = self.least_damage_spawn_location(self, game_state, deploy_locations)
+        send_location = self.least_damage_spawn_location(game_state, deploy_locations)
 
-        game_state.attempt_spawn(INTERCEPTOR, send_location) # Sends one intercepter to prevent massive rushes
+        # Sends one intercepter to prevent massive rushes
+        game_state.attempt_spawn(INTERCEPTOR, send_location)
 
-        while game_state.get_resource(MP) >= game_state.type_cost(SCOUT)[MP]: # Uses all available MP to attack
+        # Uses all available MP to attack
+        while game_state.get_resource(MP) >= game_state.type_cost(SCOUT)[MP]:
             game_state.attempt_spawn(SCOUT, send_location)
 
     def stall_with_interceptors(self, game_state):
@@ -158,25 +160,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         # friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         interceptor_points = [[3, 10], [24, 10]]
 
-        for point in interceptor_points:
-            game_state.attempt_spawn(INTERCEPTOR, point);
-
-        # Remove locations that are blocked by our own structures
-        # since we can't deploy units there.
-        deploy_locations = self.filter_blocked_locations(interceptor_points, game_state)
-
-        # While we have remaining MP to spend lets send out interceptors randomly.
-        while game_state.get_resource(MP) >= game_state.type_cost(INTERCEPTOR)[MP] and len(deploy_locations) > 0:
-            # Choose a random deploy location.
-            deploy_index = random.randint(0, len(deploy_locations) - 1)
-            deploy_location = deploy_locations[deploy_index]
-
-            game_state.attempt_spawn(INTERCEPTOR, deploy_location)
-            """
-            We don't have to remove the location since multiple mobile 
-            units can occupy the same space.
-            """
-
+        game_state.attempt_spawn(INTERCEPTOR, interceptor_points)
+    
     def demolisher_line_strategy(self, game_state):
         """
         Build a line of the cheapest stationary unit so our demolisher can attack from long range.
