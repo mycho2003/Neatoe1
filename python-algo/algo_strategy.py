@@ -91,6 +91,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         # Useful tool for setting up your base locations: https://www.kevinbai.design/terminal-map-maker
         # More community tools available at: https://terminal.c1games.com/rules#Download
 
+        funnel_two = [[16, 9], [17, 10], [18, 11], [19, 12], [20, 13]]
+        extra_turrets = [[3, 12], [24, 12]]
         # Place turrets that attack enemy units
         turret_locations = [[22, 10], [5, 10], [14, 9]]
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
@@ -109,12 +111,21 @@ class AlgoStrategy(gamelib.AlgoCore):
         # if bottom walls are low, then reinforce them
         for wall in bottom_walls:
             wall = game_state.contains_stationary_unit(wall)
-            if wall and wall.health/wall.max_health < 0.5:
-                game_state.attempt_spawn(WALL, wall - [0, 1])
+            if wall and wall.health / wall.max_health < 0.5:
+                game_state.attempt_spawn(WALL, [wall[0], wall[1] - 1])
 
         if game_state.get_resource(SP) > 6:
-            funnel_two = [[17, 10], [18, 11], [19, 12], [20, 13]]
             game_state.attempt_spawn(WALL, funnel_two)
+
+        if game_state.get_resource(SP) >= 20:
+            game_state.attempt_spawn(TURRET, extra_turrets)
+            for turret in extra_turrets:
+                game_state.attempt_upgrade([turret[0], turret[1] + 1])
+
+        for wall in wall_locations:
+            if game_state.get_resource(SP) <= 12:
+                break
+            game_state.attempt_upgrade(wall)
 
     def build_reactive_defense(self, game_state):
         """
@@ -149,8 +160,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         # friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         interceptor_points = [[3, 10], [24, 10]]
 
-        for point in interceptor_points:
-            game_state.attempt_spawn(INTERCEPTOR, point)
+        game_state.attempt_spawn(INTERCEPTOR, interceptor_points)
 
     def demolisher_line_strategy(self, game_state):
         """
